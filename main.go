@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -9,7 +10,15 @@ import (
 	"github.com/google/uuid"
 )
 
+type LnsImtTopicRewrite struct {
+	ApplicationName string `json:"applicationName"`
+	NodeName        string `json:"nodeName"`
+	DevEUI          string `json:"devEUI"`
+}
+
 func main() {
+	var litr LnsImtTopicRewrite
+
 	id := uuid.New().String()
 	var sbMqttClientId strings.Builder
 	var sbPubTopic strings.Builder
@@ -68,12 +77,27 @@ func main() {
 
 	for {
 		incoming := <-c
-		s := strings.Split(incoming[0], "/")
-		devEUI := s[3]
+		json.Unmarshal([]byte(incoming[1]), &litr)
+		var sdt strings.Builder // string device type
+		organizationName := "SmartCampusMaua"
+		applicationName := litr.ApplicationName
+		deviceId := litr.DevEUI
+		deviceName := litr.NodeName
+		s := strings.Split(deviceName, "_") // string device type
+		sdt.WriteString(s[0])
+		sdt.WriteString("s")
+		deviceType := sdt.String()
+
 		sbPubTopic.Reset()
-		sbPubTopic.WriteString("lns_imt/")
-		sbPubTopic.WriteString(devEUI)
-		sbPubTopic.WriteString("/rx")
+		sbPubTopic.WriteString("OpenDataTelemetry/")
+		sbPubTopic.WriteString(organizationName)
+		sbPubTopic.WriteString("/")
+		sbPubTopic.WriteString(applicationName)
+		sbPubTopic.WriteString("/")
+		sbPubTopic.WriteString(deviceType)
+		sbPubTopic.WriteString("/")
+		sbPubTopic.WriteString(deviceId)
+		sbPubTopic.WriteString("/rx/lns_imt")
 		// fmt.Printf("RECEIVED TOPIC: %s MESSAGE: %s\n", incoming[0], incoming[1])
 		token := pClient.Publish(sbPubTopic.String(), byte(pQos), false, incoming[1])
 		token.Wait()
