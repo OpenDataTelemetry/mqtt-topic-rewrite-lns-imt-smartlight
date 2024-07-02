@@ -21,7 +21,7 @@ func main() {
 	id := uuid.New().String()
 	var sbMqttClientId strings.Builder
 	var sbPubTopic strings.Builder
-	sbMqttClientId.WriteString("mqtt-topic-rewrite-lns-imt-smartlights")
+	sbMqttClientId.WriteString("mqtt-topic-rewrite-lns-imt-smartlight-")
 	sbMqttClientId.WriteString(id)
 
 	sTopic := "application/6/node/+/rx"
