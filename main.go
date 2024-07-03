@@ -173,7 +173,7 @@ func main() {
 		// 	applicationName == "SmartLights" {
 		// fmt.Printf("Parse Infrastructure application payload data %s\n", applicationName)
 		sbPubTopic.Reset()
-		sbPubTopic.WriteString("OpenDataTelemetry/SmartCampusMaua/SmartLight/")
+		sbPubTopic.WriteString("OpenDataTelemetry/IMT/SmartLight/")
 		sbPubTopic.WriteString(devEUI)
 		sbPubTopic.WriteString("/rx/lns_imt")
 		// fmt.Printf("RECEIVED TOPIC: %s MESSAGE: %s\n", incoming[0], incoming[1])
