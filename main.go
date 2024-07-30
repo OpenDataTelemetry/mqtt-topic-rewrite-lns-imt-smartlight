@@ -19,14 +19,16 @@ func main() {
 	// var litr LnsImtTopicRewrite
 
 	id := uuid.New().String()
-	var sbMqttClientId strings.Builder
+	var sbMqttSubClientId strings.Builder
+	var sbMqttPubClientId strings.Builder
 	var sbPubTopic strings.Builder
-	sbMqttClientId.WriteString("mqtt-topic-rewrite-lns-imt-smartlight-")
-	sbMqttClientId.WriteString(id)
+	sbMqttSubClientId.WriteString("mqtt-topic-rewrite-lns-imt-")
+	sbMqttSubClientId.WriteString(id)
+	sbMqttPubClientId.WriteString("mqtt-topic-rewrite-lns-imt-")
+	sbMqttPubClientId.WriteString(id)
 
-	sTopic := "application/6/node/+/rx"
 	sBroker := "mqtt://networkserver.maua.br:1883"
-	sClientId := sbMqttClientId.String()
+	sClientId := sbMqttSubClientId.String()
 	sUser := "PUBLIC"
 	sPassword := "public"
 	sQos := 0
@@ -37,8 +39,18 @@ func main() {
 	sOpts.SetUsername(sUser)
 	sOpts.SetPassword(sPassword)
 
+	// sTopic := "application/6/node/+/rx"
+	// sTopics := []string{"application/6/node/+/rx", "application/18/node/+/rx"}
+	sTopics := map[string]byte{
+		"application/6/node/+/rx":  byte(sQos),
+		"application/13/node/+/rx": byte(sQos),
+		"application/18/node/+/rx": byte(sQos),
+		"application/19/node/+/rx": byte(sQos),
+		"application/20/node/+/rx": byte(sQos),
+	}
+
 	pBroker := "mqtt://mqtt.maua.br:1883"
-	pClientId := sbMqttClientId.String()
+	pClientId := sbMqttPubClientId.String()
 	pUser := "public"
 	pPassword := "public"
 	pQos := 0
@@ -69,7 +81,14 @@ func main() {
 		fmt.Printf("Connected to %s\n", pBroker)
 	}
 
-	if token := sClient.Subscribe(sTopic, byte(sQos), nil); token.Wait() && token.Error() != nil {
+	// Subscribe(topic string, qos byte, callback MessageHandler) Token
+	// if token := sClient.Subscribe(sTopic, byte(sQos), nil); token.Wait() && token.Error() != nil {
+	// 	fmt.Println(token.Error())
+	// 	os.Exit(1)
+	// }
+
+	// SubscribeMultiple(filters map[string]byte, callback MessageHandler) Token
+	if token := sClient.SubscribeMultiple(sTopics, nil); token.Wait() && token.Error() != nil {
 		fmt.Println(token.Error())
 		os.Exit(1)
 	}
@@ -173,9 +192,9 @@ func main() {
 		// 	applicationName == "SmartLights" {
 		// fmt.Printf("Parse Infrastructure application payload data %s\n", applicationName)
 		sbPubTopic.Reset()
-		sbPubTopic.WriteString("OpenDataTelemetry/IMT/SmartLight/")
+		sbPubTopic.WriteString("OpenDataTelemetry/IMT/LNS/")
 		sbPubTopic.WriteString(devEUI)
-		sbPubTopic.WriteString("/rx/lns_imt")
+		sbPubTopic.WriteString("/rx/imt")
 		// fmt.Printf("RECEIVED TOPIC: %s MESSAGE: %s\n", incoming[0], incoming[1])
 		token := pClient.Publish(sbPubTopic.String(), byte(pQos), false, incoming[1])
 		token.Wait()
