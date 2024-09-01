@@ -41,6 +41,7 @@ func main() {
 
 	mqttSubTopics := map[string]byte{
 		"application/6/node/+/rx":  byte(mqttSubQos),
+		"application/9/node/+/rx":  byte(mqttSubQos),
 		"application/13/node/+/rx": byte(mqttSubQos),
 		"application/18/node/+/rx": byte(mqttSubQos),
 		"application/19/node/+/rx": byte(mqttSubQos),
@@ -92,6 +93,8 @@ func main() {
 		switch s[1] {
 		case "6":
 			measurement = "SmartLight"
+		case "9":
+			measurement = "EnergyMeter"
 		case "13":
 			measurement = "WeatherStation"
 		case "18":
