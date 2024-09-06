@@ -9,15 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// type LnsImtTopicRewrite struct {
-// 	ApplicationName string `json:"applicationName"`
-// 	NodeName        string `json:"nodeName"`
-// 	DevEUI          string `json:"devEUI"`
-// }
-
 func main() {
-	// var litr LnsImtTopicRewrite
-
 	id := uuid.New().String()
 	var sbMqttSubClientId strings.Builder
 	var sbMqttPubClientId strings.Builder
