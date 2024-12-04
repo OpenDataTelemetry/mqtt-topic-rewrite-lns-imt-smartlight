@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -9,7 +10,16 @@ import (
 	"github.com/google/uuid"
 )
 
+func connLostHandler(c MQTT.Client, err error) {
+	fmt.Printf("Connection lost, reason: %v\n", err)
+	os.Exit(1)
+}
+
 func main() {
+	// MQTT.ERROR = log.New(os.Stdout, "[ERROR] ", 0)
+	MQTT.CRITICAL = log.New(os.Stdout, "[CRIT] ", 0)
+	// MQTT.WARN = log.New(os.Stdout, "[WARN]  ", 0)
+	// MQTT.DEBUG = log.New(os.Stdout, "[DEBUG] ", 0)
 	id := uuid.New().String()
 	var sbMqttSubClientId strings.Builder
 	var sbMqttPubClientId strings.Builder
@@ -30,6 +40,7 @@ func main() {
 	mqttSubOpts.SetClientID(mqttSubClientId)
 	mqttSubOpts.SetUsername(mqttSubUser)
 	mqttSubOpts.SetPassword(mqttSubPassword)
+	mqttSubOpts.SetConnectionLostHandler(connLostHandler)
 
 	mqttSubTopics := map[string]byte{
 		"application/6/node/+/rx":  byte(mqttSubQos),
@@ -60,6 +71,7 @@ func main() {
 
 	mqttSubClient := MQTT.NewClient(mqttSubOpts)
 	if token := mqttSubClient.Connect(); token.Wait() && token.Error() != nil {
+		// fmt.Printf("Error %s\n", token.Error())
 		panic(token.Error())
 	} else {
 		fmt.Printf("Connected to %s\n", mqttSubBroker)
@@ -104,7 +116,7 @@ func main() {
 		sbPubTopic.WriteString("/")
 		sbPubTopic.WriteString(deviceId)
 		sbPubTopic.WriteString("/up/imt")
-		// fmt.Printf("RECEIVED TOPIC: %s MESSAGE: %s\n", incoming[0], incoming[1])
+		fmt.Printf("RECEIVED TOPIC: %s MESSAGE: %s\n", incoming[0], incoming[1])
 		token := pClient.Publish(sbPubTopic.String(), byte(mqttPubQos), false, incoming[1])
 		token.Wait()
 
