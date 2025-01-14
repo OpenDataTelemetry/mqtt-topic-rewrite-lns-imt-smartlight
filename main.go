@@ -99,6 +99,8 @@ func main() {
 		case "1":
 			if s[3] == "0004a30b001e0b53" || s[3] == "0004a30b01000200" || s[3] == "0004a30b0028ddd9" {
 				measurement = "SoilMoisture3DepthLevels"
+			} else {
+				break
 			}
 		case "6":
 			if s[3] == "0004a30b00e94314" {
