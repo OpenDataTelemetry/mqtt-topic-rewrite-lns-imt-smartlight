@@ -43,6 +43,7 @@ func main() {
 	mqttSubOpts.SetConnectionLostHandler(connLostHandler)
 
 	mqttSubTopics := map[string]byte{
+		"application/1/node/+/rx":  byte(mqttSubQos),
 		"application/6/node/+/rx":  byte(mqttSubQos),
 		"application/9/node/+/rx":  byte(mqttSubQos),
 		"application/13/node/+/rx": byte(mqttSubQos),
