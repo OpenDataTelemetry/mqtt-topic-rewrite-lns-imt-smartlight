@@ -94,41 +94,53 @@ func main() {
 	for {
 		incoming := <-c
 		s := strings.Split(incoming[0], "/")
+		goTopic := false
 		var measurement string
 		switch s[1] {
 		case "1":
 			if s[3] == "0004a30b001e0b53" || s[3] == "0004a30b01000200" || s[3] == "0004a30b0028ddd9" {
 				measurement = "SoilMoisture3DepthLevels"
+				goTopic = true
 			} else {
 				break
 			}
 		case "6":
 			if s[3] == "0004a30b00e94314" {
 				measurement = "Sprinkler"
+				goTopic = true
+			} else {
+				measurement = "SmartLight"
+				goTopic = true
 			}
-			measurement = "SmartLight"
 		case "9":
 			measurement = "EnergyMeter"
+			goTopic = true
 		case "13":
 			measurement = "WeatherStation"
+			goTopic = true
 		case "18":
 			measurement = "WaterTankLevel"
+			goTopic = true
 		case "19":
 			measurement = "GaugePressure"
+			goTopic = true
 		case "20":
 			measurement = "Hydrometer"
+			goTopic = true
 		}
 		deviceId := s[3]
 
-		sbPubTopic.Reset()
-		sbPubTopic.WriteString("OpenDataTelemetry/IMT/LNS/")
-		sbPubTopic.WriteString(measurement)
-		sbPubTopic.WriteString("/")
-		sbPubTopic.WriteString(deviceId)
-		sbPubTopic.WriteString("/up/imt")
-		fmt.Printf("RECEIVED TOPIC: %s MESSAGE: %s\n", incoming[0], incoming[1])
-		token := pClient.Publish(sbPubTopic.String(), byte(mqttPubQos), false, incoming[1])
-		token.Wait()
+		if goTopic == true {
+			sbPubTopic.Reset()
+			sbPubTopic.WriteString("OpenDataTelemetry/IMT/LNS/")
+			sbPubTopic.WriteString(measurement)
+			sbPubTopic.WriteString("/")
+			sbPubTopic.WriteString(deviceId)
+			sbPubTopic.WriteString("/up/imt")
+			fmt.Printf("RECEIVED TOPIC: %s MESSAGE: %s\n", incoming[0], incoming[1])
+			token := pClient.Publish(sbPubTopic.String(), byte(mqttPubQos), false, incoming[1])
+			token.Wait()
+		}
 
 	}
 }
