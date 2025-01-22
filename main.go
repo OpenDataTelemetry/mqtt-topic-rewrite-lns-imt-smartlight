@@ -101,6 +101,9 @@ func main() {
 			if s[3] == "0004a30b001e0b53" || s[3] == "0004a30b01000200" || s[3] == "0004a30b0028ddd9" {
 				measurement = "SoilMoisture3DepthLevels"
 				goTopic = true
+			} else if s[3] == "0004a30b001a1d6f" {
+				measurement = "VibrationAverage"
+				goTopic = true
 			} else {
 				break
 			}
