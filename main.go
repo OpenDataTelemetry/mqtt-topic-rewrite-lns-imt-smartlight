@@ -105,7 +105,7 @@ func main() {
 				measurement = "VibrationAverage"
 				goTopic = true
 			} else if s[3] == "0004a30b0023580e" {
-				measurement = "8PointTemperature"
+				measurement = "Temperature8Point"
 				goTopic = true
 			} else {
 				break
